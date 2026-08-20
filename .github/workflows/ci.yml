@@ -83,13 +83,19 @@ jobs:
       - run: npm ci
       - run: npm run test:coverage
 
+  # Node 20 is missing here on purpose, and its absence is covered by the
+  # `smoke` job below. jsdom 30 fails to start on it --
+  # `webidl.util.markAsUncloneable is not a function` -- which is a limit of the
+  # test environment, not of this package. Dropping Node 20 from `engines` to
+  # match the test runner would be the tail wagging the dog: nothing shipped
+  # here is newer than ES2022.
   test-node:
     name: test (node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24, 26]
+        node: [22, 24, 26]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -116,3 +122,45 @@ jobs:
             exit 1
           fi
           echo "test matrix passed on all Node versions"
+
+  # What Node actually has to do with this package: load it. Runs on the oldest
+  # supported version, with no jsdom involved, so the `engines` floor is a
+  # tested claim rather than an assumption.
+  smoke:
+    name: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Import the built package on the oldest supported Node
+        run: |
+          node --input-type=module -e "
+            import { moveItem } from './dist/array.js';
+            const moved = moveItem(['a', 'b', 'c'], 0, 2);
+            if (moved.join('') !== 'bca') throw new Error('ESM subpath: got ' + moved.join(''));
+            console.log('esm  ./array  ok');
+          "
+          node --input-type=commonjs -e "
+            const { moveItem } = require('./dist/array.cjs');
+            const moved = moveItem(['a', 'b', 'c'], 0, 2);
+            if (moved.join('') !== 'bca') throw new Error('CJS subpath: got ' + moved.join(''));
+            console.log('cjs  ./array  ok');
+          "
+          node --input-type=module -e "
+            import * as api from './dist/index.js';
+            if (typeof api.DragDropProvider !== 'function') throw new Error('ESM root: DragDropProvider missing');
+            if (typeof api.useSortableList !== 'function') throw new Error('ESM root: useSortableList missing');
+            console.log('esm  .       ok');
+          "
+          node --input-type=commonjs -e "
+            const api = require('./dist/index.cjs');
+            if (typeof api.DragDropProvider !== 'function') throw new Error('CJS root: DragDropProvider missing');
+            console.log('cjs  .       ok');
+          "
