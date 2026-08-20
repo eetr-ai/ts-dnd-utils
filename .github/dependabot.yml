@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # Minor and patch bumps batch into one low-risk pull request. Majors are
+      # deliberately excluded so they arrive one at a time and get read —
+      # grouping them hides a breaking toolchain change among routine ones.
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+    ignore:
+      # TypeScript 7 is held back by the build, not by this code — `tsc --noEmit`
+      # passes under it. tsup generates the declaration bundle with a copy of
+      # rollup-plugin-dts compiled into its own dist and pinned against
+      # TypeScript 5, which crashes on the newer compiler API:
+      #
+      #   TypeError: Cannot read properties of undefined
+      #     (reading 'useCaseSensitiveFileNames')
+      #
+      # Re-confirmed against typescript 7.0.2 with tsup 8.5.1 when this
+      # repository was set up. Because the plugin is inlined rather than a real
+      # dependency, no override or resolution reaches it — the fix has to come
+      # from tsup. Revisit when tsup ships a declaration pipeline that works
+      # with TypeScript 7, or if declaration generation moves to
+      # `tsc --emitDeclarationOnly`. Remove this entry then.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
