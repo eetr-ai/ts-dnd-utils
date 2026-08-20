@@ -70,6 +70,29 @@ describe("packaging constraints", () => {
   });
 });
 
+function attributesIn(text: string): Set<string> {
+  return new Set(text.match(/data-dnd-[a-z-]+/g) ?? []);
+}
+
+describe("documented styling hooks", () => {
+  it("documents exactly the data attributes the components render", () => {
+    // The README presents these as the way to style a headless library, which
+    // makes them public API. Without this, renaming one is a silent breaking
+    // change for every consumer's stylesheet.
+    const rendered = new Set<string>();
+    for (const file of sourceFiles()) {
+      for (const attribute of attributesIn(file.text)) rendered.add(attribute);
+    }
+    const documented = attributesIn(readFileSync(join(projectRoot, "README.md"), "utf8"));
+
+    expect(rendered.size).toBeGreaterThan(0);
+    // Compared as sets: order is meaningless here, and sorting would need
+    // toSorted (ES2023) or a lint-flagged in-place sort, neither of which is
+    // worth raising this package's language floor for.
+    expect(documented).toEqual(rendered);
+  });
+});
+
 describe("genericity", () => {
   it("is actually reading the shipped sources", () => {
     // Without this, a wrong path would make every check below pass by finding
