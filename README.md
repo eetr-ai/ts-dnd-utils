@@ -290,11 +290,20 @@ all and is safe anywhere.
 Stated plainly, because they follow from the input model and no amount of API
 will hide them.
 
-- **No touch support.** HTML5 drag & drop dispatches no events from touch, on
-  any mobile browser. A row will not drag on a phone or tablet. Supporting touch
-  means a different input model — pointer events with manual hit-testing — which
-  this library does not attempt. Give anything that must work on touch a
-  non-drag path, such as move-up/move-down buttons.
+- **Touch is not supported.** Two separate reasons, worth telling apart.
+
+  This library binds no touch or pointer handlers at all. `DragDropPanel` arms
+  its handle on `onMouseDown`, which touch does not reliably produce, so the
+  handle path cannot work from a finger. `wholeElementDraggable` skips the
+  handle and leaves a permanently `draggable` element — but whether a touch
+  gesture on that element becomes a drag is entirely the browser's decision, and
+  mainstream mobile browsers generally do not make it.
+
+  Treat touch as unsupported and give anything that must work there a non-drag
+  path, such as move-up and move-down buttons calling the same `moveItem` your
+  `onReorder` does. Supporting touch properly means a different input model —
+  pointer events with manual hit-testing — which this library does not attempt.
+
 - **No keyboard reordering.** For the same reason: there is no keyboard gesture
   the browser turns into a drag. `DraggableButton` is a real `<button>` and its
   `onClick` is keyboard-reachable, and the drag handle is a focusable button with
