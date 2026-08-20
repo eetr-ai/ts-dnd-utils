@@ -37,6 +37,7 @@ describe("public surface", () => {
         "acceptsDrag",
         "dragOver",
         "drop",
+        "isRealDragLeave",
         "readDropInformation",
         "startDrag",
         "useDragActions",

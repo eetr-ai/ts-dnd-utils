@@ -6,6 +6,7 @@ export {
   DND_MIME_TYPE,
   dragOver,
   drop,
+  isRealDragLeave,
   readDropInformation,
   startDrag,
 } from "./engine.js";

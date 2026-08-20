@@ -237,9 +237,9 @@ Plain CSS:
 [data-dnd-dragging] {
   opacity: 0.5;
 }
+/* box-shadow, not height + background -- see below. */
 [data-dnd-indicator] {
-  height: 2px;
-  background: #475569;
+  box-shadow: 0 0 0 2px #475569;
   border-radius: 999px;
 }
 ```
