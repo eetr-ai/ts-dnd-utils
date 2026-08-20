@@ -143,3 +143,10 @@ vite.config.ts.timestamp-*
 
 # Local packaged tarballs
 *.tgz
+
+# The demo resolves the library from `file:../..`, whose version moves with
+# every release, so a committed lockfile for it would be stale by design.
+examples/demo/package-lock.json
+
+# Local editor/agent scratch
+.claude/

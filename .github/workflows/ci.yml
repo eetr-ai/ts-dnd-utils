@@ -164,3 +164,28 @@ jobs:
             if (typeof api.DragDropProvider !== 'function') throw new Error('CJS root: DragDropProvider missing');
             console.log('cjs  .       ok');
           "
+
+  # The demo is a real consumer: it resolves the package through its exports
+  # map, not through src/. Building it on every pull request means an API change
+  # that would break somebody's app fails here rather than after release.
+  demo:
+    name: demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # The demo depends on `file:../..`, which npm links rather than copies, so
+      # dist/ has to exist before its install resolves.
+      - run: npm run build
+      # `install` rather than `ci`: the linked dependency's version moves with
+      # every release, so a committed lockfile for it would be stale by design.
+      - run: npm install --no-audit --no-fund
+        working-directory: examples/demo
+      - run: npm run build
+        working-directory: examples/demo

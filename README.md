@@ -18,6 +18,18 @@ npm install @eetr/ts-dnd-utils
 
 React 18 or newer, as a peer dependency. Nothing else ships.
 
+## Try it
+
+There is a runnable demo in [`examples/demo`](examples/demo) — two lists on
+different groups, palette drags, an empty-state target, and an insertion
+indicator, styled entirely through the `data-*` hooks below.
+
+```bash
+npm ci && npm run build
+npm install --prefix examples/demo
+npm run dev --prefix examples/demo
+```
+
 ## Quick start
 
 A sortable list is a provider, a hook, and a panel per row.
