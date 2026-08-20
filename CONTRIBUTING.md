@@ -14,18 +14,20 @@ Node 20 or newer.
 
 ## Scripts
 
-| Script                  | What it does                                  |
-| ----------------------- | --------------------------------------------- |
-| `npm run build`         | Bundles ESM + CJS + declarations into `dist/` |
-| `npm run dev`           | Same, in watch mode                           |
-| `npm test`              | Runs the test suite once                      |
-| `npm run test:watch`    | Runs the tests in watch mode                  |
-| `npm run test:coverage` | Runs the tests and reports coverage           |
-| `npm run lint`          | Lints with oxlint                             |
-| `npm run format`        | Formats with oxfmt                            |
-| `npm run format:check`  | Checks formatting without writing             |
-| `npm run typecheck`     | Type-checks without emitting                  |
-| `npm run pack:local`    | Builds and packs a tarball for local install  |
+| Script                  | What it does                                               |
+| ----------------------- | ---------------------------------------------------------- |
+| `npm run build`         | Bundles ESM + CJS + declarations into `dist/`              |
+| `npm run dev`           | Same, in watch mode                                        |
+| `npm test`              | Runs the test suite once                                   |
+| `npm run test:watch`    | Runs the tests in watch mode                               |
+| `npm run test:coverage` | Runs the tests and reports coverage                        |
+| `npm run lint`          | Lints with oxlint                                          |
+| `npm run format`        | Formats with oxfmt                                         |
+| `npm run format:check`  | Checks formatting without writing                          |
+| `npm run typecheck`     | Type-checks without emitting                               |
+| `npm run pack:local`    | Builds and packs a tarball for local install               |
+| `npm run demo:install`  | Installs the demo's dependencies (once)                    |
+| `npm run demo`          | Builds the library, then serves the demo at localhost:5173 |
 
 Before opening a pull request:
 

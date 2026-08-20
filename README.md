@@ -25,10 +25,14 @@ different groups, palette drags, an empty-state target, and an insertion
 indicator, styled entirely through the `data-*` hooks below.
 
 ```bash
-npm ci && npm run build
-npm ci --prefix examples/demo
-npm run dev --prefix examples/demo
+npm ci             # once, for this package
+npm run demo:install   # once, for the demo's own dependencies
+npm run demo           # builds the library, then serves the demo
 ```
+
+`npm run demo` rebuilds the library each time it starts, since the demo resolves
+it through the published entry points rather than from `src/`. While changing
+library code, run `npm run dev` in a second terminal for a rebuild on save.
 
 ## Quick start
 
