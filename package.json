@@ -1,6 +1,6 @@
 {
   "name": "@eetr/ts-dnd-utils",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Headless drag & drop primitives for React — typed payloads, drag groups, and no runtime dependencies.",
   "keywords": [
     "dnd",
