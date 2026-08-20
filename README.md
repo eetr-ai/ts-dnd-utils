@@ -26,7 +26,7 @@ indicator, styled entirely through the `data-*` hooks below.
 
 ```bash
 npm ci && npm run build
-npm install --prefix examples/demo
+npm ci --prefix examples/demo
 npm run dev --prefix examples/demo
 ```
 

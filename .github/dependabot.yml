@@ -37,6 +37,21 @@ updates:
         update-types:
           - version-update:semver-major
 
+  # The demo is a required status check, so its toolchain should not be left to
+  # rot. Everything grouped into one pull request a week: it ships to nobody.
+  - package-ecosystem: npm
+    directory: "/examples/demo"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      demo:
+        patterns:
+          - "*"
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
