@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import type { DropCallback, DropInformation } from "./types.js";
 
@@ -14,6 +14,14 @@ export interface SortableListOptions<T = unknown> {
    * Leave it out and such drops are ignored.
    */
   onInsert?: ((at: number, data: T | undefined) => void) | undefined;
+  /**
+   * An item from a *different* list sharing this group was dropped at `at`.
+   *
+   * Leave it out and such drops are ignored, which is the safe default: the
+   * incoming `index` refers to a list that is not this one, so treating it as a
+   * reorder would move the wrong row.
+   */
+  onDropFromOtherList?: ((at: number, info: DropInformation<T>) => void) | undefined;
 }
 
 /** Props to spread onto a `<DragDropPanel>` standing for one list item. */
@@ -53,8 +61,12 @@ export function useSortableList<T = unknown>({
   dragGroup,
   onReorder,
   onInsert,
+  onDropFromOtherList,
 }: SortableListOptions<T>): SortableList<T> {
   const [dragOverIndex, setDragOverIndex] = useState(-1);
+  // Identifies this list so a drop can be told apart from one belonging to
+  // another list on the same group.
+  const sourceId = useId();
 
   const containerProps = useMemo<SortableContainerProps>(() => {
     const clear = (): void => setDragOverIndex(-1);
@@ -66,12 +78,19 @@ export function useSortableList<T = unknown>({
 
   function getItemProps(index: number, data?: T): SortableItemProps<T> {
     return {
-      dropInformation: { dragGroup, index, data },
-      onDragOverItem: (info) => setDragOverIndex(info.index ?? -1),
+      dropInformation: { dragGroup, index, data, sourceId },
+      // The hovered index is the one from this closure. Reading it back off the
+      // callback argument would work today only because the panel echoes the
+      // information it was handed.
+      onDragOverItem: () => setDragOverIndex(index),
       onDrop: (info) => {
         setDragOverIndex(-1);
         if (info.index === undefined) {
+          // No position means it came from somewhere unordered -- a palette.
           onInsert?.(index, info.data);
+        } else if (info.sourceId !== sourceId) {
+          // Indexed, but the index counts positions in a different list.
+          onDropFromOtherList?.(index, info);
         } else if (info.index !== index) {
           onReorder(info.index, index);
         }

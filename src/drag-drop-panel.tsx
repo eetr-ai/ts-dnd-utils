@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { DragEvent, ReactNode } from "react";
 
 import { useDragActions, useDragDropInfo } from "./context.js";
@@ -65,6 +65,21 @@ export function DragDropPanel<T = unknown>({
   const { dragAllowed, active } = useDragDropInfo();
   const { beginDrag, endDrag } = useDragActions();
 
+  // Disarming has to happen on the window, not on the handle. A press that ends
+  // anywhere else -- released off the button, or ended without ever starting a
+  // drag -- never delivers mouseup to the handle, and the row would stay
+  // draggable indefinitely, swallowing text selection from then on.
+  useEffect(() => {
+    if (!armed) return undefined;
+    const disarm = (): void => setArmed(false);
+    window.addEventListener("mouseup", disarm);
+    window.addEventListener("dragend", disarm);
+    return () => {
+      window.removeEventListener("mouseup", disarm);
+      window.removeEventListener("dragend", disarm);
+    };
+  }, [armed]);
+
   const dragGroup = dropInformation.dragGroup;
   const canDrag = !disabled && dragAllowed && (armed || wholeElementDraggable);
   const isDragSource =
@@ -129,7 +144,6 @@ export function DragDropPanel<T = unknown>({
           aria-label={handleLabel}
           disabled={disabled}
           onMouseDown={() => setArmed(true)}
-          onMouseUp={() => setArmed(false)}
         >
           {handle ?? <DragHandleIcon />}
         </button>

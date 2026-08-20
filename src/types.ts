@@ -19,6 +19,12 @@ export interface DropInformation<T = unknown> {
    * keeps two lists on one page from swallowing each other's items.
    */
   dragGroup: string;
+  /**
+   * Which list the drag started from. `useSortableList` sets this for you and
+   * uses it to tell one of its own items apart from an item of some other list
+   * that happens to share the group — whose `index` means nothing here.
+   */
+  sourceId?: string | undefined;
 }
 
 /** Called by a drop target once a compatible item is released over it. */
