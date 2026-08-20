@@ -40,7 +40,7 @@ subject on `main`** — and that is what Release Please reads to build the
 changelog. Titles must follow
 [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 feat: add a keyboard fallback for the drag handle
 fix: clear the active drag when a drag is cancelled
 docs: explain the drag group model

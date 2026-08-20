@@ -4,10 +4,14 @@ on:
   pull_request:
   push:
     branches: [main]
-  # A release pull request is opened with the built-in GITHUB_TOKEN, which by
-  # design does not start further workflow runs — so it never gets checks of its
-  # own. Running this against the release branch reports them against its head
-  # commit, which is what branch protection is waiting for.
+  # A release pull request is opened with the built-in GITHUB_TOKEN. Runs for it
+  # ARE created, but held in GitHub's `action_required` state until a maintainer
+  # approves them from the pull request's own Checks section. Worth knowing:
+  # `gh pr checks` reports nothing at all while a run is held, which reads
+  # exactly like "no checks were ever created" — it is not the same thing.
+  #
+  # This trigger is the manual fallback for reporting checks against a branch
+  # when approving the held run is not an option.
   workflow_dispatch:
 
 permissions:

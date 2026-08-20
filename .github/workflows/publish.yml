@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Release tag to publish, bare and unprefixed (for example v1.2.3)
+        description: Bare tag name, such as v1.2.3 (no refs/tags/ prefix)
         required: true
         type: string
 
@@ -37,16 +37,23 @@ jobs:
         # being interpolated into the script, so it cannot be read as shell.
         #
         # Exactly one accepted form: a bare `vX.Y.Z`, which is what Release
-        # Please emits as `tag_name`. Accepting a `refs/tags/` prefix too would
-        # mean two spellings of the same input to keep consistent below, and
-        # accepting anything else would let a branch through.
+        # Please emits as `tag_name`. Accepting a `refs/tags/` prefix as well
+        # would mean two spellings of one input to keep consistent below, and
+        # accepting anything looser lets junk through -- a glob as forgiving as
+        # `v[0-9]*` matches `v1`, `v1.2.3foo`, and even `v1/experimental`, and a
+        # slash is legal in a tag name, so that last one resolves.
+        #
+        # The optional suffix is there so enabling prereleases in
+        # release-please-config.json does not silently break publishing.
         env:
           REF: ${{ inputs.ref }}
         run: |
-          case "$REF" in
-            v[0-9]*) echo "publishing from tag $REF" ;;
-            *) echo "refusing to publish from '$REF': not a release tag"; exit 1 ;;
-          esac
+          if [[ "$REF" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "publishing from tag $REF"
+          else
+            echo "refusing to publish from '$REF': not a release tag"
+            exit 1
+          fi
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
