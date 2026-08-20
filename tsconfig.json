@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+
+    // Environment
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    // DOM supplies DragEvent, DataTransfer, and the element types. The library
+    // uses only platform types, so it checks the same way for every consumer.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "jsx": "react-jsx",
+
+    // Outputs — tsup emits the build; tsc is used for type-checking only.
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    // Stricter type-checking
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Module semantics
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "test", "tsup.config.ts", "vitest.config.ts"]
+}
