@@ -85,6 +85,24 @@ jobs:
           # the artifact that gets published, so a poisoned cache entry would
           # reach the registry even though the job holds no credential.
           package-manager-cache: false
+
+      - name: Require package.json to agree with the tag
+        # Tag syntax being valid says nothing about what the tag points at. A
+        # tag can be moved, or named by hand through workflow_dispatch, and the
+        # commit underneath it can carry any version at all -- which would
+        # publish one version while the GitHub Release announces another.
+        # Release Please keeps the two in step; this is what catches the paths
+        # that bypass it.
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "v$VERSION" != "$REF" ]; then
+            echo "refusing to publish: package.json says $VERSION, tag says $REF"
+            exit 1
+          fi
+          echo "package.json version $VERSION matches tag $REF"
+
       - run: npm ci
       - run: npm run build
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
