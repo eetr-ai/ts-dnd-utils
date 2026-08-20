@@ -1,25 +1,35 @@
-/**
- * What a drop target learns about the thing being dragged.
- *
- * This is the whole vocabulary of the library: a payload, where it came from,
- * and which group it belongs to.
- */
-export interface DropInformation<T = unknown> {
-  /** Caller-defined payload. The library never inspects it. */
-  data?: T;
-  /**
-   * Where the dragged item sat in its own list, or `undefined` when the drag
-   * started somewhere with no ordering — a palette of new items, typically.
-   * That absence is how a drop target tells "insert a new one here" apart from
-   * "move the existing one here".
-   */
-  index?: number;
-  /**
-   * Targets accept a drag only when they declare the same group, which is what
-   * keeps two lists on one page from swallowing each other's items.
-   */
-  dragGroup: string;
-}
+export { DragDropProvider, useDragActions, useDragDropInfo } from "./context.js";
+export type { DragDropActions, DragDropProviderProps, DragDropState } from "./context.js";
 
-/** Called by a drop target once a compatible item is released over it. */
-export type DropCallback<T = unknown> = (info: DropInformation<T>) => void;
+export {
+  acceptsDrag,
+  DND_MIME_TYPE,
+  dragOver,
+  drop,
+  readDropInformation,
+  startDrag,
+} from "./engine.js";
+
+export { DragDropPanel } from "./drag-drop-panel.js";
+export type { DragDropPanelProps } from "./drag-drop-panel.js";
+
+export { DroppablePanel } from "./droppable-panel.js";
+export type { DroppablePanelProps } from "./droppable-panel.js";
+
+export { DropIndicator } from "./drop-indicator.js";
+export type { DropIndicatorProps } from "./drop-indicator.js";
+
+export { DraggableButton } from "./draggable-button.js";
+export type { DraggableButtonProps } from "./draggable-button.js";
+
+export { DragHandleIcon } from "./drag-handle.js";
+
+export { useSortableList } from "./use-sortable-list.js";
+export type {
+  SortableContainerProps,
+  SortableItemProps,
+  SortableList,
+  SortableListOptions,
+} from "./use-sortable-list.js";
+
+export type { DragEventLike, DropCallback, DropInformation } from "./types.js";

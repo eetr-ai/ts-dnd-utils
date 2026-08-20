@@ -1,7 +1,9 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  // Two entries: the React surface, and the array helpers as a subpath so a
+  // reducer running on the server can use them without importing React.
+  entry: ["src/index.ts", "src/array.ts"],
   format: ["esm", "cjs"],
   dts: true,
   sourcemap: true,
