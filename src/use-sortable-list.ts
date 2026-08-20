@@ -1,4 +1,7 @@
 import { useId, useMemo, useState } from "react";
+import type { DragEvent } from "react";
+
+import { isRealDragLeave } from "./engine.js";
 
 import type { DropCallback, DropInformation } from "./types.js";
 
@@ -34,7 +37,7 @@ export interface SortableItemProps<T = unknown> {
 /** Props to spread onto the element wrapping the list. */
 export interface SortableContainerProps {
   onDragEnd(): void;
-  onDragLeave(): void;
+  onDragLeave(event: DragEvent<Element>): void;
   onDrop(): void;
 }
 
@@ -73,7 +76,17 @@ export function useSortableList<T = unknown>({
     // All three, because a drag can leave a list in three different ways:
     // dropped on it, dropped elsewhere, or abandoned. Miss one and the
     // indicator stays on screen after the drag is over.
-    return { onDragEnd: clear, onDragLeave: clear, onDrop: clear };
+    //
+    // The leave is filtered, though. dragleave bubbles, so moving from one row
+    // to the next delivers one here — and clearing on that would drop the
+    // indicator between every pair of items and immediately put it back.
+    return {
+      onDragEnd: clear,
+      onDragLeave: (event) => {
+        if (isRealDragLeave(event)) clear();
+      },
+      onDrop: clear,
+    };
   }, []);
 
   function getItemProps(index: number, data?: T): SortableItemProps<T> {

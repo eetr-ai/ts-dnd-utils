@@ -146,8 +146,16 @@ code {
   outline-offset: 2px;
 }
 
-/* Present only while a compatible drag is over the target. */
-[data-dnd-dragging-over] {
+/*
+ * Deliberately not applied to rows. A row already shows where a drop will land
+ * through the separator above it, so outlining the whole row as well says the
+ * same thing twice and reads as noise. The empty-state target has no separator
+ * to show, so it is the one place the outline earns its keep.
+ *
+ * Note this is outline rather than border: outline paints outside the box
+ * without reserving space, so the target cannot change size under the pointer.
+ */
+[data-dnd-droppable][data-dnd-dragging-over] {
   outline: 2px dashed var(--accent);
   outline-offset: 2px;
 }
@@ -161,11 +169,22 @@ code {
   opacity: 0.5;
 }
 
+/*
+ * Drawn with box-shadow rather than height + background. The component is
+ * zero-height on purpose: an indicator that takes up space pushes the row below
+ * it down exactly when the pointer is near that row's edge, moving the row out
+ * from under the pointer and making the hover oscillate. box-shadow paints
+ * outside the box and reserves none of it.
+ */
 [data-dnd-indicator] {
-  height: 3px;
+  margin: 0;
   border-radius: 999px;
-  background: var(--accent);
-  margin: 0.125rem 0;
+  box-shadow: 0 0 0 1.5px var(--accent);
+}
+
+/* The row a drop would land on, cued by weight rather than by a box. */
+[data-dnd-panel][data-dnd-dragging-over] {
+  border-color: var(--accent);
 }
 
 [data-dnd-droppable] {

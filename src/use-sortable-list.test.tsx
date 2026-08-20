@@ -2,7 +2,7 @@ import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { dragEventInit, FakeDataTransfer } from "../test/data-transfer.js";
+import { dragEventInit, dragLeaveEvent, FakeDataTransfer } from "../test/data-transfer.js";
 import { DragDropProvider } from "./context.js";
 import { DragDropPanel } from "./drag-drop-panel.js";
 import { DraggableButton } from "./draggable-button.js";
@@ -95,7 +95,10 @@ describe("tracking the hover position", () => {
 
   it.each([
     ["the drag ends", (el: HTMLElement) => fireEvent.dragEnd(el)],
-    ["the drag leaves the list", (el: HTMLElement) => fireEvent.dragLeave(el)],
+    [
+      "the drag leaves the list",
+      (el: HTMLElement) => fireEvent.dragLeave(el, { relatedTarget: document.body }),
+    ],
     ["a drop happens", (el: HTMLElement) => fireEvent.drop(el)],
   ])("clears the indicator once %s", (_label, finish) => {
     // A drag leaves a list in three different ways. Miss one and the indicator
@@ -108,6 +111,21 @@ describe("tracking the hover position", () => {
     finish(screen.getByTestId("list"));
 
     expect(container.querySelectorAll("[data-dnd-indicator]")).toHaveLength(0);
+  });
+
+  it("keeps the indicator while the pointer moves from one row to the next", () => {
+    // dragleave bubbles, so crossing between rows delivers one to the
+    // container. Clearing on that dropped the indicator between every pair of
+    // items and immediately put it back -- a flicker on every transition.
+    const { panels, container } = renderList();
+    const transfer = dragFrom(panels, 0);
+    fireEvent.dragOver(panels[2]!, dragEventInit(transfer, "protected"));
+    expect(container.querySelectorAll("[data-dnd-indicator]")).toHaveLength(1);
+
+    const list = screen.getByTestId("list");
+    fireEvent(list, dragLeaveEvent(panels[1]!));
+
+    expect(container.querySelectorAll("[data-dnd-indicator]")).toHaveLength(1);
   });
 
   it("keeps containerProps referentially stable", () => {

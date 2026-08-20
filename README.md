@@ -244,6 +244,31 @@ Plain CSS:
 }
 ```
 
+### Keep hover styling out of the layout
+
+One rule matters more than the rest: **whatever you apply on
+`data-dnd-dragging-over` must not change the element's size or position.**
+
+Use `outline` or `box-shadow`. Both paint outside the box without reserving any
+of it. A `border` or a `padding` change makes the element grow at the moment the
+pointer reaches its edge, which moves it out from under the pointer, which ends
+the hover, which shrinks it back — a loop that reads as flicker and sits exactly
+on the boundary between two rows.
+
+`DropIndicator` defaults to `height: 0` for the same reason, and draws best with
+`box-shadow`:
+
+```css
+[data-dnd-indicator] {
+  box-shadow: 0 0 0 1.5px rebeccapurple;
+  border-radius: 999px;
+}
+```
+
+The library handles the other half of this — a `dragleave` fired because the
+pointer moved onto a child element is ignored, so the highlight survives the
+pointer crossing your own markup.
+
 Tailwind, via `className`:
 
 ```tsx

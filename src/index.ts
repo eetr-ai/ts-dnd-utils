@@ -32,4 +32,4 @@ export type {
   SortableListOptions,
 } from "./use-sortable-list.js";
 
-export type { DragEventLike, DropCallback, DropInformation } from "./types.js";
+export type { DragEventLike, DragLeaveEventLike, DropCallback, DropInformation } from "./types.js";

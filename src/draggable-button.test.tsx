@@ -103,16 +103,32 @@ describe("DropIndicator", () => {
     expect(indicator).toHaveAttribute("role", "presentation");
   });
 
-  it("accepts the drag passing over it", () => {
-    // It sits under the pointer mid-drag. An element that refuses the drop
-    // there makes the cursor flicker between allowed and denied.
+  it("cannot become a drop target", () => {
+    // It materialises directly under the pointer. Left interactive, it takes
+    // over as the event target and fires a dragleave on the row it annotates.
     const { container } = render(<DropIndicator />);
     const indicator = container.querySelector("[data-dnd-indicator]") as HTMLElement;
 
-    const event = new Event("dragover", { bubbles: true, cancelable: true });
-    fireEvent(indicator, event);
+    expect(indicator.style.pointerEvents).toBe("none");
+  });
 
-    expect(event.defaultPrevented).toBe(true);
+  it("reserves no layout space", () => {
+    // The regression this guards: an indicator with height pushes the row below
+    // it down at the exact moment the pointer is near that row's edge. The row
+    // moves out from under the pointer, the hovered index changes, the
+    // indicator moves, the row comes back -- and it oscillates.
+    const { container } = render(<DropIndicator />);
+    const indicator = container.querySelector("[data-dnd-indicator]") as HTMLElement;
+
+    expect(indicator.style.height).toBe("0px");
+  });
+
+  it("lets a caller override those defaults deliberately", () => {
+    const { container } = render(<DropIndicator style={{ height: "4px" }} />);
+    const indicator = container.querySelector("[data-dnd-indicator]") as HTMLElement;
+
+    expect(indicator.style.height).toBe("4px");
+    expect(indicator.style.pointerEvents).toBe("none");
   });
 
   it("takes a class name so it can be styled", () => {

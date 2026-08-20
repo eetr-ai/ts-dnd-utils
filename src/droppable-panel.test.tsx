@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { dragEventInit, FakeDataTransfer } from "../test/data-transfer.js";
+import { dragEventInit, dragLeaveEvent, FakeDataTransfer } from "../test/data-transfer.js";
 import { DragDropProvider } from "./context.js";
 import { DragDropPanel } from "./drag-drop-panel.js";
 import { DroppablePanel } from "./droppable-panel.js";
@@ -41,7 +41,7 @@ function renderEmptyState(props: Partial<Parameters<typeof DroppablePanel>[0]> =
         <span>existing</span>
       </DragDropPanel>
       <DroppablePanel dragGroup="sections" onDrop={onDrop} {...props}>
-        Drag something here
+        <span>Drag something here</span>
       </DroppablePanel>
     </DragDropProvider>,
   );
@@ -78,12 +78,23 @@ describe("hover state, uncontrolled", () => {
     expect(target).toHaveAttribute("data-dnd-dragging-over");
   });
 
+  it("stays marked when the pointer moves onto its own content", () => {
+    const { source, target } = renderEmptyState();
+    const transfer = beginDrag(source, palette);
+    fireEvent.dragOver(target, dragEventInit(transfer, "protected"));
+    expect(target).toHaveAttribute("data-dnd-dragging-over");
+
+    fireEvent(target, dragLeaveEvent(screen.getByText("Drag something here")));
+
+    expect(target).toHaveAttribute("data-dnd-dragging-over");
+  });
+
   it("unmarks itself when the drag leaves", () => {
     const { source, target } = renderEmptyState();
     const transfer = beginDrag(source, palette);
 
     fireEvent.dragOver(target, dragEventInit(transfer, "protected"));
-    fireEvent.dragLeave(target);
+    fireEvent(target, dragLeaveEvent(document.body));
 
     expect(target).not.toHaveAttribute("data-dnd-dragging-over");
   });

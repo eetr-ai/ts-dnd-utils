@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { DragEvent, ReactNode } from "react";
 
 import { useDragActions, useDragDropInfo } from "./context.js";
-import { dragOver as engineDragOver, drop as engineDrop } from "./engine.js";
+import { dragOver as engineDragOver, drop as engineDrop, isRealDragLeave } from "./engine.js";
 import type { DropCallback } from "./types.js";
 
 export interface DroppablePanelProps<T = unknown> {
@@ -54,6 +54,12 @@ export function DroppablePanel<T = unknown>({
     engineDragOver(event, dragGroup, active, () => setDraggingOver(true));
   }
 
+  function handleDragLeave(event: DragEvent<HTMLDivElement>): void {
+    // See DragDropPanel: dragleave also fires when the pointer moves onto a
+    // descendant, and clearing on those makes the highlight strobe.
+    if (isRealDragLeave(event)) setDraggingOver(false);
+  }
+
   function handleDrop(event: DragEvent<HTMLDivElement>): void {
     if (disabled) return;
     const accepted = engineDrop<T>(event, dragGroup, (info) => {
@@ -71,7 +77,7 @@ export function DroppablePanel<T = unknown>({
       className={className}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
-      onDragLeave={() => setDraggingOver(false)}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {children}
