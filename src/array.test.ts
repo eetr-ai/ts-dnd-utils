@@ -32,7 +32,7 @@ describe("moveItem", () => {
     expect(moveItem(original, 1, 1)).not.toBe(original);
   });
 
-  it.each([
+  it.each<[string, number, number]>([
     ["a source below the range", -1, 2],
     ["a source past the end", 9, 0],
     ["a fractional source", 1.5, 0],
@@ -102,7 +102,7 @@ describe("removeAt", () => {
     expect(removeAt(letters, 1)).toEqual(["a", "c", "d"]);
   });
 
-  it.each([
+  it.each<[string, number]>([
     ["past the end", 9],
     ["negative", -1],
     ["fractional", 1.5],
