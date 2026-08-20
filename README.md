@@ -185,18 +185,18 @@ Nothing ships styled. No stylesheet, no class names, no CSS framework. Every
 element takes `className` and carries stable `data-*` attributes so state can be
 targeted from any CSS approach.
 
-| Attribute                | On                                 | Present when                      |
-| ------------------------ | ---------------------------------- | --------------------------------- |
-| `data-dnd-panel`         | `DragDropPanel` root               | always                            |
-| `data-dnd-panel-content` | the content wrapper inside a panel | always                            |
-| `data-dnd-handle`        | the handle `<button>`              | always                            |
-| `data-dnd-handle-icon`   | the default grip `<svg>`           | always                            |
-| `data-dnd-droppable`     | `DroppablePanel` root              | always                            |
-| `data-dnd-palette-item`  | `DraggableButton`                  | always                            |
-| `data-dnd-indicator`     | `DropIndicator`                    | always                            |
-| `data-dnd-dragging-over` | panel or droppable                 | a compatible drag is hovering     |
-| `data-dnd-dragging`      | `DragDropPanel`                    | this row is the one being dragged |
-| `data-dnd-disabled`      | any of them                        | `disabled` is set                 |
+| Attribute                | On                                                       | Present when                                        |
+| ------------------------ | -------------------------------------------------------- | --------------------------------------------------- |
+| `data-dnd-panel`         | `DragDropPanel` root                                     | always                                              |
+| `data-dnd-panel-content` | the content wrapper inside a panel                       | always                                              |
+| `data-dnd-handle`        | the handle `<button>` of a panel                         | `showHandle` is `true`                              |
+| `data-dnd-handle-icon`   | the default grip `<svg>`, in a panel or a palette button | `showHandle` is `true` and no `handle` was supplied |
+| `data-dnd-droppable`     | `DroppablePanel` root                                    | always                                              |
+| `data-dnd-palette-item`  | `DraggableButton`                                        | always                                              |
+| `data-dnd-indicator`     | `DropIndicator`                                          | always                                              |
+| `data-dnd-dragging-over` | panel or droppable                                       | a compatible drag is hovering                       |
+| `data-dnd-dragging`      | `DragDropPanel`                                          | this row is the one being dragged                   |
+| `data-dnd-disabled`      | panel, droppable, or palette button                      | `disabled` is set                                   |
 
 Plain CSS:
 
