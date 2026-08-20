@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Release tag to publish (for example v1.2.3)
+        description: Release tag to publish, bare and unprefixed (for example v1.2.3)
         required: true
         type: string
 
@@ -35,17 +35,26 @@ jobs:
         # Only tags are publishable. A branch is mutable and can carry
         # unreviewed commits. The ref goes through the environment rather than
         # being interpolated into the script, so it cannot be read as shell.
+        #
+        # Exactly one accepted form: a bare `vX.Y.Z`, which is what Release
+        # Please emits as `tag_name`. Accepting a `refs/tags/` prefix too would
+        # mean two spellings of the same input to keep consistent below, and
+        # accepting anything else would let a branch through.
         env:
           REF: ${{ inputs.ref }}
         run: |
           case "$REF" in
-            refs/tags/v*|v*) echo "publishing from $REF" ;;
+            v[0-9]*) echo "publishing from tag $REF" ;;
             *) echo "refusing to publish from '$REF': not a release tag"; exit 1 ;;
           esac
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          # Fully qualified on purpose. Handed the bare name, git resolves it
+          # against every ref namespace, so a branch called `v1.2.3` would
+          # satisfy a request for tag `v1.2.3` -- and a branch is mutable, which
+          # is the one thing the guard above exists to rule out.
+          ref: refs/tags/${{ inputs.ref }}
           persist-credentials: false
 
       - name: Resolve the exact commit
