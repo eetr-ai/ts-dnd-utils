@@ -95,10 +95,7 @@ describe("tracking the hover position", () => {
 
   it.each([
     ["the drag ends", (el: HTMLElement) => fireEvent.dragEnd(el)],
-    [
-      "the drag leaves the list",
-      (el: HTMLElement) => fireEvent.dragLeave(el, { relatedTarget: document.body }),
-    ],
+    ["the drag leaves the list", (el: HTMLElement) => fireEvent(el, dragLeaveEvent(document.body))],
     ["a drop happens", (el: HTMLElement) => fireEvent.drop(el)],
   ])("clears the indicator once %s", (_label, finish) => {
     // A drag leaves a list in three different ways. Miss one and the indicator

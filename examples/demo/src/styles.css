@@ -99,7 +99,13 @@ code {
 .list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+
+  /*
+   * Wide enough for the 4px insertion line to sit in it with clear air either
+   * side. At 0.5rem the line filled half the gap and read as attached to the
+   * row above rather than as a position between two rows.
+   */
+  gap: 0.75rem;
   margin-top: 1rem;
   min-height: 4rem;
 }
@@ -179,12 +185,18 @@ code {
 [data-dnd-indicator] {
   margin: 0;
   border-radius: 999px;
-  box-shadow: 0 0 0 1.5px var(--accent);
-}
+  box-shadow: 0 0 0 2px var(--accent);
 
-/* The row a drop would land on, cued by weight rather than by a box. */
-[data-dnd-panel][data-dnd-dragging-over] {
-  border-color: var(--accent);
+  /*
+   * The element renders at the top edge of its row's wrapper, which puts it
+   * against the row rather than in the middle of the gap above it. Half the
+   * list's 0.75rem gap lifts it to centre.
+   *
+   * A transform rather than a negative margin: transforms paint, they do not
+   * reflow. A negative margin here would pull the row below it upward, which is
+   * the very layout shift this component exists to avoid.
+   */
+  transform: translateY(-0.375rem);
 }
 
 [data-dnd-droppable] {
