@@ -183,9 +183,11 @@ jobs:
       # The demo depends on `file:../..`, which npm links rather than copies, so
       # dist/ has to exist before its install resolves.
       - run: npm run build
-      # `install` rather than `ci`: the linked dependency's version moves with
-      # every release, so a committed lockfile for it would be stale by design.
-      - run: npm install --no-audit --no-fund
+      # `ci`, so the demo's own toolchain is pinned and a release upstream
+      # cannot turn this required check red on its own. The linked dependency
+      # is recorded as `{"resolved": "../..", "link": true}` with no version at
+      # all, so bumping this package's version leaves the lockfile valid.
+      - run: npm ci --no-audit --no-fund
         working-directory: examples/demo
       - run: npm run build
         working-directory: examples/demo
