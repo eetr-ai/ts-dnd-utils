@@ -58,6 +58,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "demo": "npm run build && npm --prefix examples/demo run dev",
+    "demo:install": "npm --prefix examples/demo ci",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage --passWithNoTests",
