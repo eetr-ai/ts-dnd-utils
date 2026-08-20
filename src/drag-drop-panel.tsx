@@ -3,7 +3,12 @@ import type { DragEvent, ReactNode } from "react";
 
 import { useDragActions, useDragDropInfo } from "./context.js";
 import { DragHandleIcon } from "./drag-handle.js";
-import { dragOver as engineDragOver, drop as engineDrop, startDrag } from "./engine.js";
+import {
+  dragOver as engineDragOver,
+  drop as engineDrop,
+  isRealDragLeave,
+  startDrag,
+} from "./engine.js";
 import type { DropCallback, DropInformation } from "./types.js";
 
 export interface DragDropPanelProps<T = unknown> {
@@ -102,6 +107,13 @@ export function DragDropPanel<T = unknown>({
     });
   }
 
+  function handleDragLeave(event: DragEvent<HTMLDivElement>): void {
+    // Only when the pointer really left. Crossing onto the handle or the
+    // content wrapper fires dragleave on this element too, and clearing there
+    // makes the highlight strobe for as long as the pointer stays inside.
+    if (isRealDragLeave(event)) setDraggingOver(false);
+  }
+
   function handleDragEnd(): void {
     setArmed(false);
     setDraggingOver(false);
@@ -133,7 +145,7 @@ export function DragDropPanel<T = unknown>({
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
-      onDragLeave={() => setDraggingOver(false)}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {showHandle && (

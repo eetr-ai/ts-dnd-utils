@@ -42,3 +42,12 @@ export interface DragEventLike {
   preventDefault(): void;
   stopPropagation(): void;
 }
+
+/**
+ * The parts of a `dragleave` event needed to tell a real departure from the
+ * pointer merely moving onto a descendant.
+ */
+export interface DragLeaveEventLike {
+  currentTarget: Node;
+  relatedTarget: EventTarget | null;
+}

@@ -1,4 +1,4 @@
-import type { DragEventLike, DropCallback, DropInformation } from "./types.js";
+import type { DragEventLike, DragLeaveEventLike, DropCallback, DropInformation } from "./types.js";
 
 /**
  * The payload rides as JSON under this type.
@@ -52,6 +52,29 @@ export function readDropInformation<T>(event: DragEventLike): DropInformation<T>
   if (typeof candidate.dragGroup !== "string") return null;
 
   return candidate as DropInformation<T>;
+}
+
+/**
+ * Whether a `dragleave` means the pointer actually left the element.
+ *
+ * It usually does not. `dragenter` and `dragleave` are not "entered the box"
+ * and "left the box" — they fire whenever the *event target* changes, and they
+ * bubble. Moving the pointer from a row onto a `<span>` inside that row fires
+ * `dragleave` on the row, with `relatedTarget` set to the span, even though the
+ * pointer is still well inside it.
+ *
+ * Treating that as a departure is what makes a hover highlight strobe: the
+ * spurious leave clears it, the next `dragover` sets it back, and `dragover`
+ * repeats for as long as the pointer is over the element.
+ *
+ * A null `relatedTarget` — the pointer leaving the window, mostly — counts as a
+ * real departure. Erring that way is safe: `dragover` fires continuously, so a
+ * highlight cleared in error comes back within a frame, whereas one left set in
+ * error stays on screen after the drag is gone.
+ */
+export function isRealDragLeave(event: DragLeaveEventLike): boolean {
+  const next = event.relatedTarget;
+  return !(next instanceof Node && event.currentTarget.contains(next));
 }
 
 /**

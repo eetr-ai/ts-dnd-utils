@@ -98,3 +98,16 @@ export function dragEventInit(
   transfer.mode = mode;
   return { dataTransfer: transfer };
 }
+
+/**
+ * Fires a `dragleave` that actually carries `relatedTarget`.
+ *
+ * Needed because jsdom implements no `DragEvent`, so Testing Library falls back
+ * to a plain `Event` for drag types and quietly drops `relatedTarget` — which
+ * is the one property that distinguishes "the pointer left" from "the pointer
+ * moved onto a child". A `MouseEvent` carries it and React dispatches on the
+ * event's type, so it reaches the `onDragLeave` handler all the same.
+ */
+export function dragLeaveEvent(relatedTarget: EventTarget | null): MouseEvent {
+  return new MouseEvent("dragleave", { bubbles: true, cancelable: true, relatedTarget });
+}

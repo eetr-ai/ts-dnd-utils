@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { dragEventInit, FakeDataTransfer } from "../test/data-transfer.js";
+import { dragEventInit, dragLeaveEvent, FakeDataTransfer } from "../test/data-transfer.js";
 import { DragDropProvider } from "./context.js";
 import { DragDropPanel } from "./drag-drop-panel.js";
 import { DND_MIME_TYPE } from "./engine.js";
@@ -185,12 +185,28 @@ describe("hovering", () => {
     expect(target).not.toHaveAttribute("data-dnd-dragging-over");
   });
 
+  it("keeps the mark when the pointer moves onto something inside the row", () => {
+    // The flicker bug. dragleave fires on the row as the pointer crosses onto
+    // its handle or its content, even though it never left -- and clearing
+    // there makes the highlight strobe, because the next dragover sets it
+    // straight back and dragover repeats for as long as the pointer is over.
+    const { source, target, handle } = twoPanels();
+    const transfer = beginDrag(source, handle);
+    fireEvent.dragOver(target, dragEventInit(transfer, "protected"));
+    expect(target).toHaveAttribute("data-dnd-dragging-over");
+
+    const inside = target.querySelector("[data-dnd-panel-content]") as HTMLElement;
+    fireEvent(target, dragLeaveEvent(inside));
+
+    expect(target).toHaveAttribute("data-dnd-dragging-over");
+  });
+
   it("clears the mark when the drag leaves", () => {
     const { source, target, handle } = twoPanels();
     const transfer = beginDrag(source, handle);
 
     fireEvent.dragOver(target, dragEventInit(transfer, "protected"));
-    fireEvent.dragLeave(target);
+    fireEvent(target, dragLeaveEvent(document.body));
 
     expect(target).not.toHaveAttribute("data-dnd-dragging-over");
   });

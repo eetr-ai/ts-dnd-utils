@@ -6,6 +6,7 @@ export {
   DND_MIME_TYPE,
   dragOver,
   drop,
+  isRealDragLeave,
   readDropInformation,
   startDrag,
 } from "./engine.js";
@@ -32,4 +33,4 @@ export type {
   SortableListOptions,
 } from "./use-sortable-list.js";
 
-export type { DragEventLike, DropCallback, DropInformation } from "./types.js";
+export type { DragEventLike, DragLeaveEventLike, DropCallback, DropInformation } from "./types.js";

@@ -6,6 +6,7 @@ import {
   DND_MIME_TYPE,
   dragOver,
   drop,
+  isRealDragLeave,
   readDropInformation,
   startDrag,
 } from "./engine.js";
@@ -199,5 +200,56 @@ describe("drop", () => {
     expect(onDrop).toHaveBeenCalledWith(expect.objectContaining({ dragGroup: "sections" }));
     const [delivered] = onDrop.mock.calls[0] ?? [];
     expect(delivered?.index).toBeUndefined();
+  });
+});
+
+function elements() {
+  const parent = document.createElement("div");
+  const child = document.createElement("span");
+  const grandchild = document.createElement("em");
+  child.append(grandchild);
+  parent.append(child);
+  return { parent, child, grandchild };
+}
+
+describe("isRealDragLeave", () => {
+  it("is false when the pointer moved onto a direct child", () => {
+    // The whole bug: dragleave fires on the parent as the pointer crosses into
+    // anything inside it, and treating that as a departure makes the highlight
+    // strobe for as long as the pointer stays put.
+    const { parent, child } = elements();
+    expect(isRealDragLeave({ currentTarget: parent, relatedTarget: child })).toBe(false);
+  });
+
+  it("is false for a deeper descendant too", () => {
+    const { parent, grandchild } = elements();
+    expect(isRealDragLeave({ currentTarget: parent, relatedTarget: grandchild })).toBe(false);
+  });
+
+  it("is true when the pointer moved to an unrelated element", () => {
+    const { parent } = elements();
+    expect(
+      isRealDragLeave({ currentTarget: parent, relatedTarget: document.createElement("div") }),
+    ).toBe(true);
+  });
+
+  it("is true when the pointer moved to the parent's own parent", () => {
+    const { parent } = elements();
+    const outer = document.createElement("div");
+    outer.append(parent);
+    expect(isRealDragLeave({ currentTarget: parent, relatedTarget: outer })).toBe(true);
+  });
+
+  it("treats a missing relatedTarget as a real departure", () => {
+    // Leaving the window, mostly. Erring this way is the safe side: dragover
+    // repeats, so a highlight cleared in error returns within a frame, while
+    // one left set in error stays on screen after the drag is gone.
+    const { parent } = elements();
+    expect(isRealDragLeave({ currentTarget: parent, relatedTarget: null })).toBe(true);
+  });
+
+  it("treats a non-Node relatedTarget as a real departure", () => {
+    const { parent } = elements();
+    expect(isRealDragLeave({ currentTarget: parent, relatedTarget: new EventTarget() })).toBe(true);
   });
 });
